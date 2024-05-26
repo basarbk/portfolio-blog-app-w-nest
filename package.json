@@ -9,7 +9,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "start:dev": "nest start --watch",
+    "start:dev": "cross-env NODE_ENV=development nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -20,7 +20,9 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typeorm": "ts-node ./node_modules/typeorm/cli",
     "migration:run": "npm run typeorm migration:run -- -d ./database/config.ts",
-    "migration:revert": "npm run typeorm migration:revert -- -d ./database/config.ts"
+    "migration:revert": "npm run typeorm migration:revert -- -d ./database/config.ts",
+    "migration:run:dev": "cross-env NODE_ENV=development npm run typeorm migration:run -- -d ./database/config.ts",
+    "migration:revert:dev": "cross-env NODE_ENV=development npm run typeorm migration:revert -- -d ./database/config.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",

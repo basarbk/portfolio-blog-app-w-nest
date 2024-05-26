@@ -18,6 +18,11 @@ export class EmailService {
   }
 
   async sendSignUpEmail(email: string, token: string): Promise<void> {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(
+        `${this.configService.get<string>('CLIENT_HOST')}/callback?token=${token}&operation=register`,
+      );
+    }
     await this.transport.sendMail({
       from: 'info@my-app.com',
       to: email,

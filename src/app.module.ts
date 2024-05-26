@@ -11,6 +11,7 @@ import { DatabaseModuleOptions } from './config/database.configuration';
     UserModule,
     EmailModule,
     ConfigModule.forRoot({
+      envFilePath: process.env.NODE_ENV === 'development' ? '.dev.env' : '.env',
       isGlobal: true,
     }),
   ],
