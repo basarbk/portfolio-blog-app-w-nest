@@ -1,17 +1,18 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class EmailService {
   private transport: nodemailer.Transporter;
 
-  constructor() {
+  constructor(private configService: ConfigService) {
     this.transport = nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
+      host: this.configService.get<string>('EMAIL_HOST'),
+      port: this.configService.get<number>('PORT'),
       auth: {
-        user: 'virginia.thompson43@ethereal.email',
-        pass: 'AKTPfSQqPtqKd3JHjb',
+        user: this.configService.get<string>('EMAIL_USERNAME'),
+        pass: this.configService.get<string>('EMAIL_PASSWORD'),
       },
     });
   }
@@ -25,7 +26,7 @@ export class EmailService {
             <h1>You are almost there</h1>
             <span>Click the link below to confirm your email and finish creating your My App account.</span>
             <div>
-                <a href="http://localhost:5173/callback?token=${token}&operation=register">Create your account</a>
+                <a href="${this.configService.get<string>('CLIENT_HOST')}/callback?token=${token}&operation=register">Create your account</a>
             </div>
         `,
     });
