@@ -9,7 +9,7 @@ import { EmailModule } from './email/email.module';
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: './app-db.sqlite',
-      synchronize: true,
+      synchronize: false,
       entities: [User],
     }),
     UserModule,
