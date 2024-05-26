@@ -17,7 +17,8 @@ export class UserService {
     user.email = body.email;
     user.name = body.email.split('@')[0];
     user.handle = user.name;
+    user.registrationToken = crypto.randomUUID();
     await this.userRepository.save(user);
-    await this.emailService.sendSignUpEmail(user.email, '123');
+    await this.emailService.sendSignUpEmail(user.email, user.registrationToken);
   }
 }
