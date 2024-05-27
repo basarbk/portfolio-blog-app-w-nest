@@ -4,6 +4,7 @@ import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { CreateUser } from './dto/create-user.dto';
 import { EmailService } from '../email/email.service';
+import { generateUniqueValue } from '../shared';
 
 @Injectable()
 export class UserService {
@@ -17,7 +18,15 @@ export class UserService {
     user.email = body.email;
     user.name = body.email.split('@')[0];
     user.handle = user.name;
-    user.registrationToken = crypto.randomUUID();
+
+    const userInDB = await this.userRepository.findOneBy({
+      handle: user.handle,
+    });
+    if (userInDB) {
+      user.handle = user.name + generateUniqueValue(true);
+    }
+
+    user.registrationToken = generateUniqueValue();
     await this.userRepository.save(user);
     await this.emailService.sendSignUpEmail(user.email, user.registrationToken);
   }
