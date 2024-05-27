@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
@@ -27,7 +27,18 @@ export class UserService {
     }
 
     user.registrationToken = generateUniqueValue();
-    await this.userRepository.save(user);
-    await this.emailService.sendSignUpEmail(user.email, user.registrationToken);
+    try {
+      await this.userRepository.save(user);
+      await this.emailService.sendSignUpEmail(
+        user.email,
+        user.registrationToken,
+      );
+    } catch (exception) {
+      if (exception.message.includes('UNIQUE constraint')) {
+        throw new BadRequestException('Invalid request', {
+          cause: [{ property: 'email', constraints: ['Email is in use'] }],
+        });
+      }
+    }
   }
 }
