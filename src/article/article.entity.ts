@@ -25,6 +25,9 @@ export class Article {
   @Column({ nullable: true })
   image: string;
 
+  @Column({ default: false })
+  published: boolean;
+
   @CreateDateColumn({
     default: () => 'CURRENT_TIMESTAMP',
   })
@@ -35,6 +38,9 @@ export class Article {
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   updated_at: Date;
+
+  @Column({ nullable: true })
+  published_at: Date;
 
   @ManyToOne(() => User, (user) => user.articles)
   user: User;

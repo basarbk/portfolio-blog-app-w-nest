@@ -36,6 +36,23 @@ export class ArticleService {
     value: ArticleRequest,
     user: User,
   ): Promise<{ id: number }> {
+    const articleInDB = await this.getArticle(id, user);
+    articleInDB.title = value.title;
+    articleInDB.content = value.content;
+    articleInDB.image = value.image;
+    await this.articleRepository.save(articleInDB);
+    return { id };
+  }
+
+  async publish(id: number, user: User): Promise<{ published: boolean }> {
+    const articleInDB = await this.getArticle(id, user);
+    articleInDB.published = !articleInDB.published;
+    articleInDB.published_at = articleInDB.published ? new Date() : null;
+    await this.articleRepository.save(articleInDB);
+    return { published: articleInDB.published };
+  }
+
+  private async getArticle(id: number, user: User): Promise<Article> {
     const articleInDB = await this.articleRepository.findOne({
       where: { id },
       loadRelationIds: { disableMixedMap: true },
@@ -47,11 +64,6 @@ export class ArticleService {
     if (articleInDB.user.id !== user.id) {
       throw new ForbiddenException();
     }
-
-    articleInDB.title = value.title;
-    articleInDB.content = value.content;
-    articleInDB.image = value.image;
-    await this.articleRepository.save(articleInDB);
-    return { id };
+    return articleInDB;
   }
 }
