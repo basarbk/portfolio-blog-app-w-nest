@@ -34,4 +34,8 @@ export class AuthService {
       token: token.token,
     };
   }
+
+  async deleteToken(token: string | null): Promise<void> {
+    await this.tokenRepository.delete({ token });
+  }
 }
