@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ArticleRequest } from './dto/article-request.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Article } from './article.entity';
@@ -25,5 +29,29 @@ export class ArticleService {
     article.user = user;
     await this.articleRepository.save(article);
     return { id: article.id };
+  }
+
+  async update(
+    id: number,
+    value: ArticleRequest,
+    user: User,
+  ): Promise<{ id: number }> {
+    const articleInDB = await this.articleRepository.findOne({
+      where: { id },
+      loadRelationIds: { disableMixedMap: true },
+    });
+    if (!articleInDB) {
+      throw new NotFoundException();
+    }
+
+    if (articleInDB.user.id !== user.id) {
+      throw new ForbiddenException();
+    }
+
+    articleInDB.title = value.title;
+    articleInDB.content = value.content;
+    articleInDB.image = value.image;
+    await this.articleRepository.save(articleInDB);
+    return { id };
   }
 }

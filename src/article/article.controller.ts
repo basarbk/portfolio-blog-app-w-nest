@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { ArticleService } from './article.service';
 import { ArticleRequest } from './dto/article-request.dto';
 import { AuthGuard } from '../auth/auth.guard';
@@ -16,5 +16,15 @@ export class ArticleController {
     @CurrentUser() user: User,
   ): Promise<{ id: number }> {
     return this.articleService.save(body, user);
+  }
+
+  @Put('/:id')
+  @UseGuards(AuthGuard)
+  async updateArticle(
+    @Body() body: ArticleRequest,
+    @CurrentUser() user: User,
+    @Param('id') id: number,
+  ): Promise<{ id: number }> {
+    return this.articleService.update(id, body, user);
   }
 }
