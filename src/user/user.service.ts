@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, FindOptionsWhere, Repository } from 'typeorm';
 import { CreateUser } from './dto/create-user.dto';
 import { EmailService } from '../email/email.service';
 import { Operation, generateUniqueValue } from '../shared';
@@ -56,14 +56,22 @@ export class UserService {
   }
 
   async validateToken(operation: Operation, token: string): Promise<User> {
-    const user = await this.userRepository.findOneBy({
-      registrationToken: token,
-    });
+    const where: FindOptionsWhere<User> = {};
+    if (operation === Operation.register) {
+      where.registrationToken = token;
+    } else {
+      where.loginToken = token;
+    }
+    const user = await this.userRepository.findOneBy(where);
     if (!user) {
       throw new BadRequestException('Invalid token');
     }
 
-    user.registrationToken = null;
+    if (operation === Operation.register) {
+      user.registrationToken = null;
+    } else {
+      user.loginToken = null;
+    }
     this.userRepository.save(user);
     return user;
   }
