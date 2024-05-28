@@ -2,6 +2,7 @@ import {
   BadGatewayException,
   BadRequestException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
@@ -65,5 +66,25 @@ export class UserService {
     user.registrationToken = null;
     this.userRepository.save(user);
     return user;
+  }
+
+  async generateLoginToken(email: string): Promise<void> {
+    const user = await this.userRepository.findOneBy({ email });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    user.loginToken = generateUniqueValue();
+
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    try {
+      await queryRunner.startTransaction();
+      await queryRunner.manager.save(user);
+      await this.emailService.sendLoginEmail(user.email, user.loginToken);
+      await queryRunner.commitTransaction();
+    } catch (exception) {
+      await queryRunner.rollbackTransaction();
+      throw new BadGatewayException('Server error');
+    }
   }
 }

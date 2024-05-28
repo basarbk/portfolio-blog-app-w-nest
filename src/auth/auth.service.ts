@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Token } from './token.entity';
 import { Repository } from 'typeorm';
 import { generateUniqueValue } from '../shared';
+import { LoginUser } from './dto/login-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -37,5 +38,9 @@ export class AuthService {
 
   async deleteToken(token: string | null): Promise<void> {
     await this.tokenRepository.delete({ token });
+  }
+
+  async handleLogin(request: LoginUser): Promise<void> {
+    await this.userService.generateLoginToken(request.email);
   }
 }
