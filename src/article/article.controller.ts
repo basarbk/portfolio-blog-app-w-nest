@@ -57,7 +57,8 @@ export class ArticleController {
   @Get('/:idOrSlug')
   async getArticleByIdOrSlug(
     @Param('idOrSlug') idOrSlug: string,
+    @CurrentUser() user: User,
   ): Promise<ArticleWithContent> {
-    return this.articleService.getArticleByIdOrSlug(idOrSlug);
+    return this.articleService.getArticleByIdOrSlug(idOrSlug, user);
   }
 }
