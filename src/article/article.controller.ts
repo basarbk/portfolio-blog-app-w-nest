@@ -15,6 +15,7 @@ import { CurrentUser } from '../auth/current-user.decorator';
 import { User } from '../user/user.entity';
 import { Page } from '../shared/pagination/pagination.decorator';
 import { Pagination } from '../shared';
+import { ArticleWithContent } from './dto/article-response.dto';
 
 @Controller('articles')
 export class ArticleController {
@@ -51,5 +52,12 @@ export class ArticleController {
   @Get()
   async getArticles(@Page() page: Pagination) {
     return this.articleService.getArticles(page);
+  }
+
+  @Get('/:idOrSlug')
+  async getArticleByIdOrSlug(
+    @Param('idOrSlug') idOrSlug: string,
+  ): Promise<ArticleWithContent> {
+    return this.articleService.getArticleByIdOrSlug(idOrSlug);
   }
 }

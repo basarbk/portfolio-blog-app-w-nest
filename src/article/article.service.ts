@@ -6,10 +6,10 @@ import {
 import { ArticleRequest } from './dto/article-request.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Article } from './article.entity';
-import { Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import { Pagination, generateUniqueValue } from '../shared';
 import { User } from '../user/user.entity';
-import { ShortArticle } from './dto/article-response.dto';
+import { ArticleWithContent, ShortArticle } from './dto/article-response.dto';
 
 @Injectable()
 export class ArticleService {
@@ -92,5 +92,23 @@ export class ArticleService {
       return { [sort]: direction };
     }
     return {};
+  }
+
+  async getArticleByIdOrSlug(idOrSlug: string): Promise<ArticleWithContent> {
+    const findOneOptions: FindOneOptions<Article> = { relations: ['user'] };
+    if (Number.isInteger(Number(idOrSlug))) {
+      findOneOptions.where = {
+        id: Number(idOrSlug),
+      };
+    } else {
+      findOneOptions.where = {
+        slug: idOrSlug,
+      };
+    }
+    const article = await this.articleRepository.findOne(findOneOptions);
+    if (!article) {
+      throw new NotFoundException();
+    }
+    return new ArticleWithContent(article);
   }
 }
