@@ -7,7 +7,7 @@ import { ArticleRequest } from './dto/article-request.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Article } from './article.entity';
 import { Repository } from 'typeorm';
-import { generateUniqueValue } from '../shared';
+import { Pagination, generateUniqueValue } from '../shared';
 import { User } from '../user/user.entity';
 
 @Injectable()
@@ -65,5 +65,19 @@ export class ArticleService {
       throw new ForbiddenException();
     }
     return articleInDB;
+  }
+
+  async getArticles({ size, page }: Pagination) {
+    const skip = page * size;
+    const [content, count] = await this.articleRepository.findAndCount({
+      skip,
+      take: size,
+    });
+    return {
+      content,
+      page,
+      size,
+      total: Math.ceil(count / size),
+    };
   }
 }

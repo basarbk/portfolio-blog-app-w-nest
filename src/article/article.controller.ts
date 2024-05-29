@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Param,
   Patch,
   Post,
@@ -12,6 +13,8 @@ import { ArticleRequest } from './dto/article-request.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { User } from '../user/user.entity';
+import { Page } from '../shared/pagination/pagination.decorator';
+import { Pagination } from '../shared';
 
 @Controller('articles')
 export class ArticleController {
@@ -43,5 +46,10 @@ export class ArticleController {
     @Param('id') id: number,
   ): Promise<{ published: boolean }> {
     return this.articleService.publish(id, user);
+  }
+
+  @Get()
+  async getArticles(@Page() page: Pagination) {
+    return this.articleService.getArticles(page);
   }
 }
