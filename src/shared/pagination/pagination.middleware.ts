@@ -13,7 +13,18 @@ export class PaginationMiddleware implements NestMiddleware {
     if (size < 1) {
       size = 1;
     }
-    req['pagination'] = new Pagination(page, size);
+
+    const sort: string = '' + req.query.sort;
+
+    let direction = 'desc';
+    if (
+      req.query.direction &&
+      ['asc', 'desc'].indexOf('' + req.query.direction) > -1
+    ) {
+      direction = '' + req.query.direction;
+    }
+
+    req['pagination'] = new Pagination(page, size, sort, direction);
     next();
   }
 }
