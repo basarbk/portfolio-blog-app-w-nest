@@ -9,6 +9,7 @@ import { Article } from './article.entity';
 import { Repository } from 'typeorm';
 import { Pagination, generateUniqueValue } from '../shared';
 import { User } from '../user/user.entity';
+import { ShortArticle } from './dto/article-response.dto';
 
 @Injectable()
 export class ArticleService {
@@ -76,9 +77,10 @@ export class ArticleService {
       skip,
       take: size,
       order: this.getOrder(sort, direction),
+      relations: ['user'],
     });
     return {
-      content,
+      content: content.map((article) => new ShortArticle(article)),
       page,
       size,
       total: Math.ceil(count / size),
