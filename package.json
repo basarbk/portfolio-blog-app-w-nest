@@ -22,7 +22,8 @@
     "migration:run": "npm run typeorm migration:run -- -d ./database/config.ts",
     "migration:revert": "npm run typeorm migration:revert -- -d ./database/config.ts",
     "migration:run:dev": "cross-env NODE_ENV=development npm run typeorm migration:run -- -d ./database/config.ts",
-    "migration:revert:dev": "cross-env NODE_ENV=development npm run typeorm migration:revert -- -d ./database/config.ts"
+    "migration:revert:dev": "cross-env NODE_ENV=development npm run typeorm migration:revert -- -d ./database/config.ts",
+    "seed": "cross-env NODE_ENV=development ts-node ./database/seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",

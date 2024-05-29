@@ -12,5 +12,6 @@ export default new DataSource({
   type: 'sqlite',
   database: process.env.DB_HOST,
   migrations: ['./database/migrations/*.ts'],
+  entities: [__dirname + '/../**/*.entity.ts'],
   logging: true,
 });
