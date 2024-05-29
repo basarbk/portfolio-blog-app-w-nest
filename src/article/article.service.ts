@@ -6,7 +6,7 @@ import {
 import { ArticleRequest } from './dto/article-request.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Article } from './article.entity';
-import { FindOneOptions, Repository } from 'typeorm';
+import { FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { Pagination, generateUniqueValue } from '../shared';
 import { User } from '../user/user.entity';
 import { ArticleWithContent, ShortArticle } from './dto/article-response.dto';
@@ -68,12 +68,31 @@ export class ArticleService {
     return articleInDB;
   }
 
-  async getArticles({ size, page, sort, direction }: Pagination) {
+  async getArticles(page: Pagination) {
+    const where: FindOptionsWhere<Article> = { published: true };
+    return this.getArticlePage(page, where);
+  }
+
+  async getArticlesOfUser(page: Pagination, idOrHandle: string, user: User) {
+    const where: FindOptionsWhere<Article> = {};
+
+    if (Number.isInteger(Number(idOrHandle))) {
+      where.user = { id: Number(idOrHandle) };
+      where.published = user?.id === Number(idOrHandle) ? undefined : true;
+    } else {
+      where.user = { handle: idOrHandle };
+      where.published = user?.handle === idOrHandle ? undefined : true;
+    }
+    return this.getArticlePage(page, where);
+  }
+
+  private async getArticlePage(
+    { size, page, sort, direction }: Pagination,
+    where: FindOptionsWhere<Article>,
+  ) {
     const skip = page * size;
     const [content, count] = await this.articleRepository.findAndCount({
-      where: {
-        published: true,
-      },
+      where,
       skip,
       take: size,
       order: this.getOrder(sort, direction),
