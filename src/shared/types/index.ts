@@ -24,7 +24,7 @@ export class Pagination {
 }
 
 export enum Category {
-  like,
-  hot,
-  readingList,
+  like = 'like',
+  hot = 'hot',
+  readingList = 'readingList',
 }
