@@ -13,6 +13,8 @@ import { AuthModule } from './auth/auth.module';
 import { ArticleModule } from './article/article.module';
 import { PaginationMiddleware } from './shared/pagination/pagination.middleware';
 import { FileModule } from './file/file.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -26,6 +28,10 @@ import { FileModule } from './file/file.module';
     AuthModule,
     ArticleModule,
     FileModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '..', 'upload'),
+      serveRoot: '/api/assets',
+    }),
   ],
   controllers: [],
   providers: [],
