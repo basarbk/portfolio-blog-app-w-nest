@@ -7,7 +7,7 @@ import {
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { EmailModule } from './email/email.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DatabaseModuleOptions } from './config/database.configuration';
 import { AuthModule } from './auth/auth.module';
 import { ArticleModule } from './article/article.module';
@@ -28,9 +28,17 @@ import { join } from 'path';
     AuthModule,
     ArticleModule,
     FileModule,
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', 'upload'),
-      serveRoot: '/api/assets',
+    ServeStaticModule.forRootAsync({
+      useFactory: (configService: ConfigService) => {
+        const uploadFolder = configService.get<string>('UPLOAD_FOLDER');
+        return [
+          {
+            rootPath: join(__dirname, '..', '..', uploadFolder),
+            serveRoot: '/api/assets',
+          },
+        ];
+      },
+      inject: [ConfigService],
     }),
   ],
   controllers: [],
