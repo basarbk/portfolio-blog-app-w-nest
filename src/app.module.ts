@@ -12,6 +12,7 @@ import { DatabaseModuleOptions } from './config/database.configuration';
 import { AuthModule } from './auth/auth.module';
 import { ArticleModule } from './article/article.module';
 import { PaginationMiddleware } from './shared/pagination/pagination.middleware';
+import { FileModule } from './file/file.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { PaginationMiddleware } from './shared/pagination/pagination.middleware'
     }),
     AuthModule,
     ArticleModule,
+    FileModule,
   ],
   controllers: [],
   providers: [],
