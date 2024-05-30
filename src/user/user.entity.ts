@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Token } from '../auth/token.entity';
 import { Article } from '../article/article.entity';
+import { Reaction } from '../reaction/reaction.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -30,4 +31,7 @@ export class User {
 
   @OneToMany(() => Article, (article) => article.user)
   articles: Article[];
+
+  @OneToMany(() => Reaction, (reaction) => reaction.user)
+  reactions: Reaction[];
 }

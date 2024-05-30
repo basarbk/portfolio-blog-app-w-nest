@@ -22,3 +22,9 @@ export class Pagination {
     this.direction = direction;
   }
 }
+
+export enum Category {
+  like,
+  hot,
+  readingList,
+}
