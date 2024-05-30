@@ -10,6 +10,7 @@ import { DataSource, FindOptionsWhere, Repository } from 'typeorm';
 import { CreateUser } from './dto/create-user.dto';
 import { EmailService } from '../email/email.service';
 import { Operation, generateUniqueValue } from '../shared';
+import { UpdateUser } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -94,5 +95,12 @@ export class UserService {
       await queryRunner.rollbackTransaction();
       throw new BadGatewayException('Server error');
     }
+  }
+
+  async updateUser(id: number, body: UpdateUser) {
+    const user = await this.userRepository.findOneBy({ id });
+    user.name = body.name;
+    user.image = body.image;
+    await this.userRepository.save(user);
   }
 }
