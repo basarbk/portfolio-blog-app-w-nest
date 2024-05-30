@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   ForbiddenException,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
@@ -16,6 +17,7 @@ import { UpdateUser } from './dto/update-user.dto';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { User } from './user.entity';
 import { AuthGuard } from '../auth/auth.guard';
+import { UserDTO } from './dto/user-dto';
 
 @Controller('users')
 export class UserController {
@@ -38,5 +40,10 @@ export class UserController {
     if (user.id !== +id) throw new ForbiddenException('Unauthorized');
     await this.userService.updateUser(user.id, body);
     return new GenericResponse('User is updated');
+  }
+
+  @Get(':handle')
+  async getUser(@Param('handle') handle: string): Promise<UserDTO> {
+    return this.userService.getUser(handle);
   }
 }

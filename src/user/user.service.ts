@@ -11,6 +11,7 @@ import { CreateUser } from './dto/create-user.dto';
 import { EmailService } from '../email/email.service';
 import { Operation, generateUniqueValue } from '../shared';
 import { UpdateUser } from './dto/update-user.dto';
+import { UserDTO } from './dto/user-dto';
 
 @Injectable()
 export class UserService {
@@ -102,5 +103,13 @@ export class UserService {
     user.name = body.name;
     user.image = body.image;
     await this.userRepository.save(user);
+  }
+
+  async getUser(handle: string): Promise<UserDTO> {
+    const user = await this.userRepository.findOneBy({ handle });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return new UserDTO(user);
   }
 }
