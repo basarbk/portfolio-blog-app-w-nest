@@ -6,6 +6,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ArticleService } from './article.service';
@@ -14,7 +15,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { User } from '../user/user.entity';
 import { Page } from '../shared/pagination/pagination.decorator';
-import { Pagination } from '../shared';
+import { Category, Pagination } from '../shared';
 import { ArticleWithContent } from './dto/article-response.dto';
 
 @Controller()
@@ -50,7 +51,14 @@ export class ArticleController {
   }
 
   @Get('articles')
-  async getArticles(@Page() page: Pagination, @CurrentUser() user: User) {
+  async getArticles(
+    @Page() page: Pagination,
+    @CurrentUser() user: User,
+    @Query('reaction') reaction: Category,
+  ) {
+    if (reaction) {
+      return this.articleService.getReactedArticles(page, user, reaction);
+    }
     return this.articleService.getArticles(page, user);
   }
 

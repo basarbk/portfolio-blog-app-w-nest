@@ -7,7 +7,7 @@ import { ArticleRequest } from './dto/article-request.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Article } from './article.entity';
 import { FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
-import { Pagination, generateUniqueValue } from '../shared';
+import { Category, Pagination, generateUniqueValue } from '../shared';
 import { User } from '../user/user.entity';
 import { ArticleWithContent, ShortArticle } from './dto/article-response.dto';
 import { ReactionService } from '../reaction/reaction.service';
@@ -85,6 +85,19 @@ export class ArticleService {
       where.user = { handle: idOrHandle };
       where.published = user?.handle === idOrHandle ? undefined : true;
     }
+    return this.getArticlePage(page, where, user);
+  }
+
+  async getReactedArticles(page: Pagination, user: User, reaction: Category) {
+    const where: FindOptionsWhere<Article> = {
+      published: true,
+      reactions: {
+        category: reaction,
+        user: {
+          id: user.id,
+        },
+      },
+    };
     return this.getArticlePage(page, where, user);
   }
 
