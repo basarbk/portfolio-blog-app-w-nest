@@ -50,8 +50,8 @@ export class ArticleController {
   }
 
   @Get('articles')
-  async getArticles(@Page() page: Pagination) {
-    return this.articleService.getArticles(page);
+  async getArticles(@Page() page: Pagination, @CurrentUser() user: User) {
+    return this.articleService.getArticles(page, user);
   }
 
   @Get('articles/:idOrSlug')

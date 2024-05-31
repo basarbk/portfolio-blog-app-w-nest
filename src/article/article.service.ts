@@ -10,11 +10,13 @@ import { FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { Pagination, generateUniqueValue } from '../shared';
 import { User } from '../user/user.entity';
 import { ArticleWithContent, ShortArticle } from './dto/article-response.dto';
+import { ReactionService } from '../reaction/reaction.service';
 
 @Injectable()
 export class ArticleService {
   constructor(
     @InjectRepository(Article) private articleRepository: Repository<Article>,
+    private reactionService: ReactionService,
   ) {}
 
   async save(value: ArticleRequest, user: User): Promise<{ id: number }> {
@@ -68,9 +70,9 @@ export class ArticleService {
     return articleInDB;
   }
 
-  async getArticles(page: Pagination) {
+  async getArticles(page: Pagination, user: User) {
     const where: FindOptionsWhere<Article> = { published: true };
-    return this.getArticlePage(page, where);
+    return this.getArticlePage(page, where, user);
   }
 
   async getArticlesOfUser(page: Pagination, idOrHandle: string, user: User) {
@@ -83,12 +85,13 @@ export class ArticleService {
       where.user = { handle: idOrHandle };
       where.published = user?.handle === idOrHandle ? undefined : true;
     }
-    return this.getArticlePage(page, where);
+    return this.getArticlePage(page, where, user);
   }
 
   private async getArticlePage(
     { size, page, sort, direction }: Pagination,
     where: FindOptionsWhere<Article>,
+    user: User,
   ) {
     const skip = page * size;
     const [content, count] = await this.articleRepository.findAndCount({
@@ -98,12 +101,27 @@ export class ArticleService {
       order: this.getOrder(sort, direction),
       relations: ['user'],
     });
+
+    const mappedContent = await this.mapToArticleWithReactions(content, user);
+
     return {
-      content: content.map((article) => new ShortArticle(article)),
+      content: mappedContent,
       page,
       size,
       total: Math.ceil(count / size),
     };
+  }
+
+  private async mapToArticleWithReactions(articles: Article[], user: User) {
+    const articlesWithReactions = [];
+    for (const article of articles) {
+      const reactions = await this.reactionService.getArticleReactions(
+        article,
+        user,
+      );
+      articlesWithReactions.push(new ShortArticle(article, reactions));
+    }
+    return articlesWithReactions;
   }
 
   private getOrder(sort: string, direction: string) {
@@ -137,6 +155,11 @@ export class ArticleService {
       if (article.user.id !== user.id) throw new NotFoundException();
     }
 
-    return new ArticleWithContent(article);
+    const reactions = await this.reactionService.getArticleReactions(
+      article,
+      user,
+    );
+
+    return new ArticleWithContent(article, reactions);
   }
 }

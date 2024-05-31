@@ -10,6 +10,7 @@ import { Reaction } from './reaction.entity';
   imports: [AuthModule, TypeOrmModule.forFeature([Reaction])],
   controllers: [ReactionController],
   providers: [ReactionService],
+  exports: [ReactionService],
 })
 export class ReactionModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

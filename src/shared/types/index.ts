@@ -28,3 +28,5 @@ export enum Category {
   hot = 'hot',
   readingList = 'readingList',
 }
+
+export type Reactions = Record<Category, { count: number; reacted: boolean }>;
